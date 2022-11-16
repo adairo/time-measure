@@ -1,149 +1,144 @@
 import { NextPage } from "next";
 import Link from "next/link";
-import {
-  DetailedHTMLProps,
-  InputHTMLAttributes,
-  PropsWithChildren,
-} from "react";
-import { useForm } from "react-hook-form";
+import { useRouter } from "next/router";
+import React from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { Button, RadioButton } from "../components/common/Button";
+import { FormError, FormHelper, FormLabel } from "../components/common/Form";
+import { saveTimeRecord, getDeltaTime, DayOption } from "../lib/time-records";
+
+export type FormData = {
+  startTime: string;
+  finishTime: string;
+  day: DayOption;
+  specificDay: Date;
+};
 
 const TimeRegister: NextPage = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+    getValues,
+    watch,
+  } = useForm<FormData>();
 
-  const onSubmit = (data: any) => console.log(data);
+  const isOtherDay = watch("day") === "other";
+  const router = useRouter();
+
+  const submitForm: SubmitHandler<FormData> = (data) => {
+    saveTimeRecord(data);
+    router.push("/");
+  };
 
   return (
     <main className="p-4">
       <header className="flex items-baseline justify-between">
         <h1 className="mb-8 text-lg font-bold">Registrar tiempo</h1>
-        <Link href="/" className="text-xs font-bold uppercase text-slate-400">
-          Regresar
+        <Link
+          href="/"
+          className="flex items-baseline text-xs font-bold uppercase text-slate-400"
+        >
+          <span className="material-symbols-rounded self-center text-[1.1rem]">
+            arrow_back_ios
+          </span>
+          <span className="tracking-wide">Regresar</span>
         </Link>
       </header>
-      <form className="grid gap-14" onSubmit={handleSubmit(onSubmit)}>
-        <fieldset>
-          <div className="mb-8">
-            <label
-              htmlFor="start"
-              className="mb-3 block font-semibold text-slate-600"
-            >
-              Hora de inicio
-            </label>
+      <form className="grid gap-14" onSubmit={handleSubmit(submitForm)}>
+        <fieldset className="space-y-8">
+          <div className="">
+            <FormLabel htmlFor="start">Hora de inicio</FormLabel>
             <input
               id="start"
               type="time"
               className="w-full rounded-lg border-none bg-slate-100 py-3 placeholder:text-slate-400"
-              {...register("start-time")}
+              {...register("startTime", { required: true })}
             />
-            <span className="mt-1 block text-slate-500">
-              Toca arriba para seleccionar una hora
-            </span>
+            {errors.startTime && (
+              <FormError>La hora de inicio es requerida</FormError>
+            )}
+            <FormHelper>Toca arriba para seleccionar una hora</FormHelper>
           </div>
           <div>
-            <label
-              htmlFor="final"
-              className="mb-3 block font-semibold text-slate-600"
-            >
-              Hora de finalización
-            </label>
+            <FormLabel htmlFor="finish">Hora de finalización</FormLabel>
             <input
-              id="start"
+              id="finish"
               type="time"
               className="w-full rounded-lg border-none bg-slate-100 py-3 placeholder:text-slate-400"
-              {...register("finish-time")}
+              {...register("finishTime", {
+                required: true,
+                validate: (value) =>
+                  getDeltaTime(getValues("startTime"), value) > 0,
+              })}
             />
-            <span className="mt-1 block text-slate-500">
-              Toca arriba para seleccionar una hora
-            </span>
+            {errors.finishTime?.type === "required" && (
+              <FormError>La hora de finalización es requerida</FormError>
+            )}
+            {errors.finishTime?.type === "validate" && (
+              <FormError>
+                La hora de finalización debe ser mayor que la hora de inicio
+              </FormError>
+            )}
+            <FormHelper>Toca arriba para seleccionar una hora</FormHelper>
           </div>
         </fieldset>
 
-        <fieldset>
-          <div className="mb-8">
-            <label className="mb-3 block font-semibold text-slate-600">
-              Elige un día
-            </label>
+        <fieldset className="space-y-8">
+          <div className="">
+            <FormLabel>Elige un día</FormLabel>
             <div className="flex justify-between">
-              <RadioButton {...register("day")} id="today">
+              <RadioButton
+                {...register("day")}
+                id="today"
+                value="today"
+                defaultChecked
+              >
                 Hoy
               </RadioButton>
 
-              <RadioButton {...register("day")} id="yesterday">
+              <RadioButton
+                {...register("day")}
+                id="yesterday"
+                value="yesterday"
+              >
                 Ayer
               </RadioButton>
 
-              <RadioButton {...register("day")} id="other-day">
+              <RadioButton {...register("day")} id="other-day" value={"other"}>
                 Otro día
               </RadioButton>
             </div>
           </div>
-          <div>
-            <label
-              htmlFor="specific-day"
-              className="mb-3 block font-semibold text-slate-600"
-            >
-              Cuándo
-            </label>
-            <input
-              id="specific-day"
-              type="time"
-              className="w-full rounded-lg border-none bg-slate-100 py-3 placeholder:text-slate-400"
-              {...register("specific-day")}
-            />
-            <span className="mt-1 block text-slate-500">
-              Toca arriba para seleccionar una hora
-            </span>
-          </div>
+          {isOtherDay && (
+            <div>
+              <FormLabel htmlFor="specific-day">Cuándo</FormLabel>
+              <input
+                id="specific-day"
+                type="date"
+                className="w-full rounded-lg border-none bg-slate-100 py-3 placeholder:text-slate-400 "
+                {...register("specificDay", {
+                  required: isOtherDay,
+                })}
+              />
+              {errors.specificDay && <FormError>Error aqui</FormError>}
+              <FormHelper>Toca arriba para seleccionar una fecha</FormHelper>
+            </div>
+          )}
         </fieldset>
 
         <fieldset className="mb-12 grid gap-3">
-          <button
-            type="submit"
-            className="w-full rounded-md bg-sky-500 px-3 py-3 font-semibold text-white"
-          >
+          <Button variant="primary" type="submit">
             Guardar tiempo
-          </button>
+          </Button>
 
-          <button
-            type="button"
-            className="w-full rounded-md bg-slate-300 px-2 py-3 font-semibold text-black"
-          >
+          <Button type="button" variant="secondary">
             Cancelar
-          </button>
+          </Button>
         </fieldset>
       </form>
     </main>
   );
 };
-
-type RadioButtonProps = {
-  id: string;
-} & NativeRadioButtonProps;
-
-type NativeRadioButtonProps = DetailedHTMLProps<
-  InputHTMLAttributes<HTMLInputElement>,
-  HTMLInputElement
->;
-
-function RadioButton({
-  children,
-  ...inputProps
-}: PropsWithChildren<RadioButtonProps>) {
-  return (
-    <div className="group w-full">
-      <input type="radio" {...inputProps} className="peer hidden" />
-      <label
-        htmlFor={inputProps.id}
-        className="block bg-slate-100 px-3  py-3 text-center transition group-first:rounded-l-lg group-last:rounded-r-lg peer-checked:bg-slate-400 peer-checked:font-semibold peer-checked:text-white"
-      >
-        {children}
-      </label>
-    </div>
-  );
-}
 
 export default TimeRegister;
