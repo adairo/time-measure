@@ -12,6 +12,7 @@ import dayjs from "dayjs";
 
 function getRelativeTime(date: string) {
   const diff = dayjs(date).diff(dayjs(), "day");
+  if (Math.abs(diff) > 3) return null;
   return (
     relativeFormatter
       .format(diff, "day")
@@ -40,18 +41,18 @@ const Home: NextPage = () => {
 
   return (
     <main className="">
-      <section className="bg-gradient-to-b from-sky-400 to-sky-200 px-4 py-6 flex justify-center ">
+      <section className="bg-gradient-to-b from-sky-500 to-sky-300 px-4 py-6 flex justify-center ">
         <div className="grid grid-cols-[1fr,auto] gap-2 items-center">
-          <div className="text-[6rem] font-bold text-white drop-shadow-lg">
+          <div className="text-[5rem] font-bold text-white drop-shadow-lg">
             {totalHours}
           </div>
           <div className="text-white -space-y-2 tracking-wide">
             <div className="font-extrabold text-xl uppercase drop-shadow-md ">
               Horas
             </div>
-            <div className="uppercase text-sky-700 font-extrabold text-xl">
-              en 13 días
-            </div>
+            {/* <div className="uppercase text-sky-700 font-extrabold text-lg">
+              en 23 días
+            </div> */}
           </div>
         </div>
       </section>
@@ -63,11 +64,12 @@ const Home: NextPage = () => {
         <Button>Cerrar periodo</Button>
       </section>
 
-      <section className=" mt-4 px-4">
+      <section className=" mt-6 px-4">
         <table className="w-full border-2 border-collapse">
           <caption className="mb-4 text-lg text-left font-bold">
             Periodo actual
           </caption>
+
           <thead className="text-left bg-slate-100">
             <tr>
               <th scope="column" className="p-3 font-semibold text-slate-600 ">
@@ -79,20 +81,17 @@ const Home: NextPage = () => {
             </tr>
           </thead>
           <tbody>
-            {currentRecords.map((record) => (
-              <tr className="">
-                <td className="p-3 text-slate-800">
-                  <span className=" mr-2 font-semibold">
-                    {getRelativeTime(record.day)}
-                  </span>{" "}
-                  {new Date(record.day).toLocaleDateString()}
-                </td>
-                <td className="flex justify-start p-3 text-right">
-                  {record.deltaHours}
-                </td>
-              </tr>
+            {currentRecords.map((record, i) => (
+              <TimeRecordItem key={record.day + i} record={record} />
             ))}
           </tbody>
+          <tfoot>
+            <tr className="bg-slate-100">
+              <td colSpan={2} className=" p-3 text-slate-500 font-semibold">
+                Ver todos los registros
+              </td>
+            </tr>
+          </tfoot>
         </table>
       </section>
       {/* <h2 className="mb-4 text-lg font-bold">Anteriores periodos</h2>
@@ -102,5 +101,23 @@ const Home: NextPage = () => {
     </main>
   );
 };
+
+function TimeRecordItem({ record }: { record: TimeRecord }) {
+  const relativeTime = getRelativeTime(record.day);
+  return (
+    <tr>
+      <td className="p-4 text-slate-800">
+        {relativeTime && (
+          <span className=" mr-2 font-semibold">
+            {getRelativeTime(record.day)}
+          </span>
+        )}
+
+        {new Date(record.day).toLocaleDateString()}
+      </td>
+      <td className="p-4 text-right">{record.deltaHours}</td>
+    </tr>
+  );
+}
 
 export default Home;

@@ -119,6 +119,7 @@ const TimeRegister: NextPage = () => {
                 className="w-full rounded-lg border-none bg-slate-100 py-3 placeholder:text-slate-400 "
                 {...register("specificDay", {
                   required: isOtherDay,
+                  valueAsDate: true,
                 })}
               />
               {errors.specificDay && <FormError>Error aqui</FormError>}
