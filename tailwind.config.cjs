@@ -7,13 +7,17 @@ module.exports = {
       sm: "0.875rem",
       base: "1rem",
       lg: "1.25rem",
+      xl: "1.5rem",
+      "2xl": "1.875rem",
     },
-    fontWeight: {
-      regular: "400",
-      semibold: "600",
-      bold: "700",
+
+    extend: {
+      fontWeight: {
+        regular: "400",
+        semibold: "600",
+        bold: "700",
+      },
     },
-    extend: {},
   },
   plugins: [require("@tailwindcss/forms")],
 };
