@@ -1,4 +1,4 @@
-import {
+import type {
   DetailedHTMLProps,
   ButtonHTMLAttributes,
   InputHTMLAttributes,
@@ -58,5 +58,7 @@ const RadioButton = forwardRef<
     </div>
   );
 });
+
+RadioButton.displayName = "RadioButton";
 
 export { Button, RadioButton };

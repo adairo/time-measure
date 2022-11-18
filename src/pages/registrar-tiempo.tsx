@@ -1,11 +1,12 @@
-import { NextPage } from "next";
+import type { NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Button, RadioButton } from "../components/common/Button";
 import { FormError, FormHelper, FormLabel } from "../components/common/Form";
-import { saveTimeRecord, getDeltaTime, DayOption } from "../lib/time-records";
+import { saveTimeRecord, getDeltaTime } from "../lib/time-records";
+import type { DayOption } from "../lib/time-records";
 
 export type FormData = {
   startTime: string;

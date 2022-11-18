@@ -1,4 +1,4 @@
-import { FormData } from "../pages/registrar-tiempo";
+import type { FormData } from "../pages/registrar-tiempo";
 
 export type DayOption = "today" | "yesterday" | "other";
 export type TimeRecord = {
@@ -41,7 +41,7 @@ export function getDateStringFromOption(option: DayOption, specificDay?: Date) {
 const CURRENT_RECORDS_KEY = "current-records";
 
 export function getTimeRecords(): TimeRecord[] {
-  let records = localStorage.getItem(CURRENT_RECORDS_KEY);
+  const records = localStorage.getItem(CURRENT_RECORDS_KEY);
   if (!records) {
     return [];
   }

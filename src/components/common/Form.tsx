@@ -1,6 +1,6 @@
-import { PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
 
-function FormHelper({ children }: PropsWithChildren<{}>) {
+function FormHelper({ children }: PropsWithChildren) {
   return <span className="mt-1 block text-slate-500">{children}</span>;
 }
 
@@ -18,7 +18,7 @@ function FormLabel({
   );
 }
 
-function FormError({ children }: PropsWithChildren<{}>) {
+function FormError({ children }: PropsWithChildren) {
   return <span className="mt-1 block text-red-600">{children}</span>;
 }
 
